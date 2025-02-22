@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Room</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            height: 300px;
+        }
+        .participant-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 h-screen flex flex-col">
+    <!-- Top Navigation -->
+    <nav class="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <i class="ri-user-line text-primary text-xl"></i>
+            </div>
+            <div>
+                <h3 class="font-medium">Sarah Mitchell</h3>
+                <div class="flex items-center text-sm text-gray-500">
+                    <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                    Online
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute left-1/2 transform -translate-x-1/2 text-center">
+            <h2 class="text-lg font-semibold">Mathematics Study Room</h2>
+            <p class="text-sm text-gray-500">Group Study Session</p>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <div class="flex space-x-2">
+                <button id="muteToggle" class="bg-gray-100 p-2 rounded-full hover:bg-gray-200">
+                    <i class="ri-mic-line"></i>
+                </button>
+                <button id="videoToggle" class="bg-gray-100 p-2 rounded-full hover:bg-gray-200">
+                    <i class="ri-video-line"></i>
+                </button>
+                <button id="screenShare" class="bg-gray-100 p-2 rounded-full hover:bg-gray-200">
+                    <i class="ri-computer-line"></i>
+                </button>
+            </div>
+            <button id="leaveCall" class="bg-red-500 text-white p-2 rounded-full">
+                <i class="ri-phone-line"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="flex-1 p-4 flex gap-4 overflow-hidden">
+        <!-- Left Section (Videos, AI Assistant, Tools) -->
+        <div class="flex-1 flex flex-col gap-4">
+            <!-- Video Grid -->
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                <div class="video-grid">
+                    <div class="relative bg-gray-200 rounded-lg overflow-hidden">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-full h-full object-cover" alt="Participant 1">
+                        <div class="participant-overlay">Emma Watson</div>
+                    </div>
+                    <div class="relative bg-gray-200 rounded-lg overflow-hidden">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-full h-full object-cover" alt="Participant 2">
+                        <div class="participant-overlay">James Cooper</div>
+                    </div>
+                    <div class="relative bg-gray-200 rounded-lg overflow-hidden">
+                        <img src="https://randomuser.me/api/portraits/women/50.jpg" class="w-full h-full object-cover" alt="Participant 3">
+                        <div class="participant-overlay">Sophia Lee</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Assistant and Progress -->
+            <div class="flex gap-4">
+                <!-- AI Assistant -->
+                <div class="flex-1 bg-white rounded-lg p-4 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold">AI Study Assistant</h3>
+                        <button class="text-primary text-sm">Clear Chat</button>
+                    </div>
+                    <div class="h-40 overflow-y-auto mb-4 space-y-3" id="aiChat">
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center">
+                                <i class="ri-robot-line text-primary"></i>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-3 text-sm flex-1">
+                                Hello! I'm your AI study assistant. How can I help you today?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="aiInput" placeholder="Ask anything..." class="flex-1 border rounded-lg px-3 py-2 text-sm">
+                        <button onclick="sendAiMessage()" class="bg-primary text-white px-4 py-2 rounded-lg">
+                            <i class="ri-send-plane-line"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress -->
+                <div class="w-72 bg-white rounded-lg p-4 shadow-sm">
+                    <h3 class="font-semibold mb-4">Study Progress</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between mb-2 text-sm">
+                                <span>Daily Goal</span>
+                                <span>75%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2 text-sm">
+                                <span>Weekly Target</span>
+                                <span>60%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-secondary h-2 rounded-full" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools Section -->
+            <div class="bg-white rounded-lg p-4 shadow-sm">
+                <div class="grid grid-cols-2 gap-4">
+                    <div id="pdfSection" class="col-span-2">
+                        <h3 class="font-semibold mb-4">PDF Summarizer</h3>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center" id="dropZone">
+                            <i class="ri-upload-cloud-line text-3xl text-gray-400 mb-2"></i>
+                            <p class="text-sm text-gray-500">Drop your PDF here or click to upload</p>
+                            <input type="file" id="fileInput" class="hidden" accept=".pdf">
+                        </div>
+                        <div id="summarySection" class="hidden mt-4">
+                            <h4 class="font-medium mb-2">Summary</h4>
+                            <div class="bg-gray-50 rounded-lg p-4 h-48 overflow-y-auto text-sm">
+                                <p id="summaryContent"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-semibold mb-2">Resources</h3>
+                        <ul class="space-y-2 text-sm">
+                            <li class="flex items-center gap-2">
+                                <i class="ri-file-text-line text-primary"></i>
+                                <span>Mathematics Textbook</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="ri-video-line text-primary"></i>
+                                <span>Video Tutorials</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="ri-question-line text-primary"></i>
+                                <span>Practice Questions</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar (Multi-tool Panel) -->
+        <div class="bg-white border rounded-lg flex flex-col">
+            <!-- Tool Tabs -->
+            <div class="border-b">
+                <div class="flex overflow-x-auto">
+                    <button class="px-4 py-2 text-sm font-medium text-primary border-b-2 border-primary">
+                        <i class="ri-message-3-line mr-1"></i> Chat
+                    </button>
+                    <button class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-primary">
+                        <i class="ri-file-text-line mr-1"></i> Notes
+                    </button>
+                    <button onclick="switchTab('pdfTab')" class="flex-1 px-4 py-3 text-sm font-medium border-b-2 border-secondary text-secondary">
+                        PDF Summarizer
+                    </button>
+                    <button onclick="switchTab('quizTab')" class="flex-1 px-4 py-3 text-sm font-medium text-gray-500 hover:text-secondary">
+                        Quiz Generator
+                    </button>
+                    <button class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-primary">
+                        <i class="ri-file-text-line mr-1"></i> Resources
+                    <button class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-primary">
+                        <i class="ri-calendar-line mr-1"></i> Tasks
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tool Content Areas -->
+            <div class="flex-1 overflow-hidden">
+                <!-- Chat Panel -->
+                <div id="chatPanel" class="h-full flex flex-col">
+                    <div class="flex-1 overflow-auto p-4">
+                        <div id="chatMessages" class="space-y-4">
+                            <!-- System Message -->
+                            <div class="text-center">
+                                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">
+                                    Session started at 10:00 AM
+                                </span>
+                            </div>
+
+                            <!-- Chat Messages -->
+                            <div class="flex items-start space-x-2">
+                                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white text-sm">
+                                    JC
+                                </div>
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-medium text-sm">James Cooper</span>
+                                        <span class="text-xs text-gray-500">10:30 AM</span>
+                                    </div>
+                                    <p class="bg-gray-100 p-2 rounded-lg text-sm mt-1">
+                                        Can someone explain the concept of derivatives?
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-2">
+                                <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center text-white text-sm">
+                                    SL
+                                </div>
+                                <div>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="font-medium text-sm">Sophia Lee</span>
+                                        <span class="text-xs text-gray-500">10:32 AM</span>
+                                    </div>
+                                    <p class="bg-gray-100 p-2 rounded-lg text-sm mt-1">
+                                        Sure! A derivative measures the rate of change of a function...
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="border-t p-4">
+                        <div class="flex items-center space-x-2">
+                            <button class="text-gray-400 hover:text-gray-600">
+                                <i class="ri-attachment-line"></i>
+                            </button>
+                            <input 
+                                type="text" 
+                                id="chatInput" 
+                                placeholder="Type a message..." 
+                                class="flex-1 p-2 border rounded-lg focus:outline-none focus:border-primary"
+                            >
+                            <button class="bg-primary text-white p-2 rounded-lg hover:bg-primary/90">
+                                <i class="ri-send-plane-line"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="toolsPanel" class="h-full flex flex-col">
+                    <!-- Tab Navigation -->
+                    <div class="flex border-b">
+                    </div>
+                
+                    <!-- PDF Summarizer Tab -->
+                    <div id="pdfTab" class="flex-1 overflow-auto p-4">
+                        <div class="space-y-4">
+                            <!-- Upload Section -->
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-secondary cursor-pointer"
+                                 id="pdfDropZone">
+                                <i class="ri-file-upload-line text-3xl text-gray-400 mb-2"></i>
+                                <p class="text-sm text-gray-600 mb-2">Drag & drop your PDF here or click to browse</p>
+                                <span class="text-xs text-gray-500">Maximum file size: 10MB</span>
+                                <input type="file" id="pdfInput" class="hidden" accept=".pdf">
+                            </div>
+                
+                            <!-- Summary Output -->
+                            <div id="summaryOutput" class="hidden">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h3 class="font-medium text-gray-700">Summary</h3>
+                                    <button class="text-xs text-secondary hover:underline" onclick="copyToClipboard()">
+                                        Copy to clipboard
+                                    </button>
+                                </div>
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <p id="summaryText" class="text-sm text-gray-600"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Quiz Generator Tab -->
+                    <div id="quizTab" class="flex-1 overflow-auto p-4 hidden">
+                        <div class="space-y-4">
+                            <!-- Quiz Configuration -->
+                            <div class="bg-white rounded-lg border p-4">
+                                <h3 class="font-medium text-gray-700 mb-3">Generate Quiz</h3>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="text-sm text-gray-600 block mb-1">Source Material</label>
+                                        <select class="w-full p-2 border rounded-lg text-sm">
+                                            <option>Select uploaded document</option>
+                                            <option>Recent Summary - Chapter 5</option>
+                                            <option>Mathematics Notes</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex gap-3">
+                                        <div class="flex-1">
+                                            <label class="text-sm text-gray-600 block mb-1">Questions</label>
+                                            <input type="number" min="5" max="20" value="10" 
+                                                   class="w-full p-2 border rounded-lg text-sm">
+                                        </div>
+                                        <div class="flex-1">
+                                            <label class="text-sm text-gray-600 block mb-1">Time (minutes)</label>
+                                            <input type="number" min="5" max="60" value="15" 
+                                                   class="w-full p-2 border rounded-lg text-sm">
+                                        </div>
+                                    </div>
+                                    <button onclick="generateQuiz()" 
+                                            class="w-full bg-secondary text-white py-2 rounded-lg text-sm hover:bg-secondary/90">
+                                        Generate Quiz
+                                    </button>
+                                </div>
+                            </div>
+                
+                            <!-- Quiz Interface -->
+                            <div id="quizInterface" class="hidden">
+                                <div class="bg-white rounded-lg border p-4">
+                                    <div class="flex items-center justify-between mb-4">
+                                        <h3 class="font-medium text-gray-700">Quiz in Progress</h3>
+                                        <div class="text-sm text-gray-600">
+                                            Time Left: <span id="quizTimer">15:00</span>
+                                        </div>
+                                    </div>
+                                    <div id="questionContainer" class="space-y-4">
+                                        <!-- Questions will be dynamically inserted here -->
+                                    </div>
+                                    <button onclick="submitQuiz()" 
+                                            class="w-full bg-secondary text-white py-2 rounded-lg text-sm mt-4 hover:bg-secondary/90">
+                                        Submit Quiz
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+
+                <!-- Notes Panel -->
+                <div id="notesPanel" class="h-full p-4 hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-medium">Shared Notes</h3>
+                        <button class="text-primary text-sm">
+                            <i class="ri-add-line mr-1"></i> New Note
+                        </button>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="border rounded-lg p-4">
+                            <textarea 
+                                class="w-full h-[200px] resize-none focus:outline-none" 
+                                placeholder="Start taking notes..."
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Tasks Panel -->
+                <div id="tasksPanel" class="h-full p-4 hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-medium">Study Tasks</h3>
+                        <button class="text-primary text-sm">
+                            <i class="ri-add-line mr-1"></i> Add Task
+                        </button>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                            <input type="checkbox" class="mr-3">
+                            <span class="text-sm">Review Calculus Chapter 5</span>
+                        </div>
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                            <input type="checkbox" class="mr-3">
+                            <span class="text-sm">Complete Practice Problems</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script>
+         // Tab Switching
+    function switchTab(tabId) {
+        const tabs = ['pdfTab', 'quizTab'];
+        tabs.forEach(tab => {
+            document.getElementById(tab).classList.toggle('hidden', tab !== tabId);
+        });
+        // Update tab buttons styling
+        const buttons = document.querySelectorAll('#toolsPanel button');
+        buttons.forEach(button => {
+            button.classList.toggle('border-secondary', button.onclick.toString().includes(tabId));
+            button.classList.toggle('text-secondary', button.onclick.toString().includes(tabId));
+        });
+    }
+
+    // PDF Summarizer Functions
+    const pdfDropZone = document.getElementById('pdfDropZone');
+    const pdfInput = document.getElementById('pdfInput');
+
+    pdfDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        pdfDropZone.classList.add('border-secondary');
+    });
+
+    pdfDropZone.addEventListener('dragleave', () => {
+        pdfDropZone.classList.remove('border-secondary');
+    });
+
+    pdfDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        if (file && file.type === 'application/pdf') {
+            handlePdfUpload(file);
+        }
+    });
+
+    pdfDropZone.addEventListener('click', () => pdfInput.click());
+    pdfInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) handlePdfUpload(file);
+    });
+
+    function handlePdfUpload(file) {
+        document.getElementById('summaryOutput').classList.remove('hidden');
+        document.getElementById('summaryText').textContent = 
+            `Processing ${file.name}... Summary will be generated shortly.`;
+        // Here you would implement actual PDF processing logic
+    }
+
+    function copyToClipboard() {
+        const text = document.getElementById('summaryText').textContent;
+        navigator.clipboard.writeText(text);
+        // Show feedback toast or notification
+    }
+
+    // Quiz Generator Functions
+    function generateQuiz() {
+        const quizInterface = document.getElementById('quizInterface');
+        quizInterface.classList.remove('hidden');
+        
+        // Sample questions (in real implementation, these would be generated from the source material)
+        const sampleQuestions = [
+            {
+                question: "What is the derivative of x²?",
+                options: ["2x", "x", "x²", "2"],
+                correct: 0
+            },
+            {
+                question: "What is the integral of 2x?",
+                options: ["x²", "x²+C", "2x²", "x²+C"],
+                correct: 1
+            }
+        ];
+
+        const container = document.getElementById('questionContainer');
+        container.innerHTML = sampleQuestions.map((q, i) => `
+            <div class="border rounded-lg p-4">
+                <p class="font-medium text-gray-700 mb-3">Question ${i + 1}: ${q.question}</p>
+                <div class="space-y-2">
+                    ${q.options.map((opt, j) => `
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" name="q${i}" value="${j}" class="text-secondary">
+                            <span class="text-sm text-gray-600">${opt}</span>
+                        </label>
+                    `).join('')}
+                </div>
+            </div>
+        `).join('');
+
+        startTimer();
+    }
+
+    function startTimer() {
+        let time = 15 * 60; // 15 minutes in seconds
+        const timerDisplay = document.getElementById('quizTimer');
+        
+        const timer = setInterval(() => {
+            time--;
+            const minutes = Math.floor(time / 60);
+            const seconds = time % 60;
+            timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (time <= 0) {
+                clearInterval(timer);
+                submitQuiz();
+            }
+        }, 1000);
+    }
+
+    function submitQuiz() {
+        // Implement quiz submission and scoring logic
+        alert('Quiz submitted! Your results will be shown shortly.');
+    }
+
+
+        // Tab Switching Logic
+        const tabButtons = document.querySelectorAll('.border-b button');
+        const panels = {
+            'Chat': document.getElementById('chatPanel'),
+            'AI Help': document.getElementById('aiHelpPanel'),
+            'Notes': document.getElementById('notesPanel'),
+            'Tasks': document.getElementById('tasksPanel')
+        };
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active states from all tabs
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('text-primary', 'border-b-2', 'border-primary');
+                    btn.classList.add('text-gray-500');
+                });
+
+                // Add active state to clicked tab
+                button.classList.add('text-primary', 'border-b-2', 'border-primary');
+                button.classList.remove('text-gray-500');
+
+                // Hide all panels
+                Object.values(panels).forEach(panel => {
+                    panel.classList.add('hidden');
+                });
+
+                // Show the selected panel
+                const panelName = button.textContent.trim();
+                panels[panelName].classList.remove('hidden');
+            });
+        });
+        // AI Assistant
+        function sendAiMessage() {
+            const input = document.getElementById('aiInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const aiChat = document.getElementById('aiChat');
+            const userMessage = document.createElement('div');
+            userMessage.className = 'flex gap-3 justify-end';
+            userMessage.innerHTML = `
+                <div class="bg-primary/10 text-primary rounded-lg p-3 text-sm flex-1">
+                    ${message}
+                </div>
+                <div class="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center">
+                    <i class="ri-user-line"></i>
+                </div>
+            `;
+            aiChat.appendChild(userMessage);
+            input.value = '';
+            aiChat.scrollTop = aiChat.scrollHeight;
+        }
+
+        // Chat functionality
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+            const messageElement = document.createElement('div');
+            messageElement.className = 'flex gap-3 mb-4';
+            messageElement.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm">
+                    SM
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium">You</span>
+                        <span class="text-xs text-gray-500">${new Date().toLocaleTimeString()}</span>
+                    </div>
+                    <p class="bg-gray-100 rounded-lg p-2 mt-1 text-sm">
+                        ${message}
+                    </p>
+                </div>
+            `;
+            chatMessages.appendChild(messageElement);
+            input.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // PDF Upload functionality
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-primary');
+        });
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-primary');
+        });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-primary');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'application/pdf') {
+                handlePdfUpload(file);
+            }
+        });
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handlePdfUpload(file);
+        });
+
+        function handlePdfUpload(file) {
+            document.getElementById('summarySection').classList.remove('hidden');
+            document.getElementById('summaryContent').textContent = 
+                `Processing ${file.name}... Summary will appear here.`;
+        }
+
+        // Control buttons functionality
+        document.querySelectorAll('#muteToggle, #videoToggle, #screenShare').forEach(button => {
+            button.addEventListener('click', () => {
+                button.classList.toggle('bg-primary');
+                button.classList.toggle('text-white');
+            });
+        });
+
+        document.getElementById('leaveCall').addEventListener('click', () => {
+            if (confirm('Are you sure you want to leave the meeting?')) {
+                // Handle leaving the meeting
+            }
+        });
+    </script>
+</body>
+</html>
